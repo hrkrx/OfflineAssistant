@@ -1,0 +1,1 @@
+Using the prebuild docker container synesthesiam/mozillatts works like a charm.

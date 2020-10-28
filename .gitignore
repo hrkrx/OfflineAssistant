@@ -3,6 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# large model files
+*.pb
+*.pth.tar
+*.tflite
+*.binary
+*.scorer
+
 # C extensions
 *.so
 
