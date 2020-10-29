@@ -13,7 +13,7 @@ from flask import Flask, Response, render_template, request
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
-def stt(audio, aggressive):
+def prepare():
     # Point to a path containing the pre-trained models & resolve ~ if used
     dirName = os.path.expanduser("/app/model")
 
@@ -21,8 +21,9 @@ def stt(audio, aggressive):
     output_graph, scorer = wavTranscriber.resolve_models(dirName)
 
     # Load output_graph, alpahbet and scorergit config --list
-    model_retval = wavTranscriber.load_model(output_graph, scorer)
+    return wavTranscriber.load_model(output_graph, scorer)
 
+def stt(audio, aggressive, model):
     if audio is not None:
         title_names = ['Filename', 'Duration(s)', 'Inference Time(s)', 'Model Load Time(s)', 'Scorer Load Time(s)']
         print("\n%-30s %-20s %-20s %-20s %s" % (title_names[0], title_names[1], title_names[2], title_names[3], title_names[4]))
@@ -32,29 +33,25 @@ def stt(audio, aggressive):
         # Run VAD on the input file
         waveFile = audio
         segments, sample_rate, audio_length = wavTranscriber.vad_segment_generator(waveFile, aggressive)
-        # f = open(waveFile.rstrip(".wav") + ".txt", 'w')
+        
         logging.debug("Saving Transcript @: %s" % waveFile.rstrip(".wav") + ".txt")
         transcript = ""
         for i, segment in enumerate(segments):
             # Run deepspeech on the chunk that just completed VAD
             logging.debug("Processing chunk %002d" % (i,))
             audio = np.frombuffer(segment, dtype=np.int16)
-            output = wavTranscriber.stt(model_retval[0], audio, sample_rate)
+            output = wavTranscriber.stt(model[0], audio, sample_rate)
             inference_time += output[1]
             logging.debug("Transcript: %s" % output[0])
             transcript = transcript +output[0] + " "
-            # f.write(output[0] + " ")
-
-        # Summary of the files processed
-        # f.close()
 
         # Extract filename from the full file path
         filename, ext = os.path.split(os.path.basename(waveFile))
         logging.debug("************************************************************************************************************")
         logging.debug("%-30s %-20s %-20s %-20s %s" % (title_names[0], title_names[1], title_names[2], title_names[3], title_names[4]))
-        logging.debug("%-30s %-20.3f %-20.3f %-20.3f %-0.3f" % (filename + ext, audio_length, inference_time, model_retval[1], model_retval[2]))
+        logging.debug("%-30s %-20.3f %-20.3f %-20.3f %-0.3f" % (filename + ext, audio_length, inference_time, model[1], model[2]))
         logging.debug("************************************************************************************************************")
-        print("%-30s %-20.3f %-20.3f %-20.3f %-0.3f" % (filename + ext, audio_length, inference_time, model_retval[1], model_retval[2]))
+        print("%-30s %-20.3f %-20.3f %-20.3f %-0.3f" % (filename + ext, audio_length, inference_time, model[1], model[2]))
 
         return transcript
 
@@ -65,6 +62,7 @@ def stt(audio, aggressive):
 
 UPLOAD_FOLDER = "/app/uploads"
 ALLOWED_EXTENSIONS = {"wav", "ogg", "mp3", "wma", "aac"}
+MODEL = prepare()
 
 # -----------------------------------------------------------------------------
 
@@ -84,7 +82,7 @@ def api_tts():
         os.system("ffmpeg -i " + filename + " -hide_banner -nostats -f wav -acodec pcm_s16le -ar 16000 -ac 1 " + "usable_" + filename )
 
         # get transcription here
-        text = stt("usable_" + filename, 1)
+        text = stt("usable_" + filename, 1, MODEL)
 
         # remove garbage
         os.unlink(filename)

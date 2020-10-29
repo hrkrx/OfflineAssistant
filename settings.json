@@ -1,0 +1,18 @@
+{
+    "languages":{
+        "de":{
+            "ttsPort":5002,
+            "sttPort":5003
+        },
+
+        "en":{
+            "ttsPort":5004,
+            "sttPort":5005
+        }
+    },
+
+    "AttentionName":["horst", "ost", "ort"],
+    "ActionDB":"mongodb://127.0.0.1:27017",
+    "UseContainerWatchdog":true,
+    "UploadFolder":"upload"
+}

@@ -32,7 +32,7 @@ RUN cd /app && \
 RUN cp /app/DeepSpeech-examples/vad_transcriber/wavTranscriber.py /app/
 RUN cp /app/DeepSpeech-examples/vad_transcriber/wavSplit.py /app/
 
-COPY templates/ /app/
+COPY templates/index.html /app/
 COPY stt.py /app/
 
 ENTRYPOINT ["python3", "/app/stt.py"]
