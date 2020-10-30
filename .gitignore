@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+STT/english/model/deepspeech-0.8.2-models.pbmm
+STT/english/model/deepspeech-0.8.2-models.tflite

@@ -11,7 +11,7 @@
         }
     },
 
-    "AttentionName":["horst", "ost", "ort"],
+    "AttentionName":["horst", "ost", "ort", "erst"],
     "ActionDB":"mongodb://127.0.0.1:27017",
     "UseContainerWatchdog":true,
     "UploadFolder":"upload"
